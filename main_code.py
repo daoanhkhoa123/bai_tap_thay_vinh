@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
-from typing import Sequence
+from typing import Sequence, Tuple
 
 class Convolution_Correlation:
     @staticmethod
@@ -149,7 +149,7 @@ class FourierGaussianFilter:
 
 class SteerabkeGaussian:
     @staticmethod
-    def _gaussian_derivative_basis(size: int, sigma: float):
+    def _gaussian_derivative_basis(size: int, sigma: float) -> Tuple[NDArray, NDArray]:
         assert size % 2 == 1
         gauss = GaussianMask.mask_gauss(sigma, size)
         
@@ -167,17 +167,10 @@ class SteerabkeGaussian:
 
     @staticmethod
     def steerable(image: NDArray, theta: float,
-              size: int = 21, sigma: float = 3.0):
+              size: int = 21, sigma: float = 3.0) -> Tuple[NDArray, NDArray, Tuple[NDArray, NDArray]]:
 
-        # basis filters
         Gx, Gy = SteerabkeGaussian._gaussian_derivative_basis(size, sigma)
-
-        # steer
         G_theta = np.cos(theta) * Gx + np.sin(theta) * Gy
-
-        # filter image
-        residual = Convolution_Correlation.convolution(
-            image, G_theta)
-
+        residual = Convolution_Correlation.convolution(image, G_theta)
         basis = (Gx, Gy)
         return residual, G_theta, basis
