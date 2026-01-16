@@ -4,11 +4,18 @@ from typing import Sequence, Tuple
 
 class Convolution_Correlation:
     @staticmethod
-    def correlation(img: NDArray, mask:NDArray) -> NDArray:
+    def correlation(img: NDArray, mask:NDArray, same_pad: bool = True) -> NDArray:
         h_in, w_in = img.shape
         h_mask, w_mask = mask.shape
-        h_out = h_in - h_mask + 1   # stride 1, no padding
-        w_out = w_in - w_mask + 1
+
+        if same_pad:
+            pad_h = h_mask // 2
+            pad_w = w_mask // 2
+            img = np.pad(img, ((pad_h, pad_h), (pad_w, pad_w)))
+            h_out, w_out = h_in, w_in
+        else:
+            h_out = h_in - h_mask + 1
+            w_out = w_in - w_mask + 1
 
         res = np.empty([h_out, w_out], dtype=np.float32)
 
@@ -21,10 +28,10 @@ class Convolution_Correlation:
         return res
 
     @staticmethod
-    def convolution(img: NDArray, mask:NDArray) -> NDArray:
+    def convolution(img: NDArray, mask:NDArray, same_pad: bool = True) -> NDArray:
         # rotate 180 degree mask
         r_mask = mask[::-1, ::-1]
-        return Convolution_Correlation.correlation(img, r_mask)
+        return Convolution_Correlation.correlation(img, r_mask, same_pad)
 
 class GaussianMask:
     @staticmethod
