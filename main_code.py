@@ -171,6 +171,6 @@ class SteerabkeGaussian:
 
         Gx, Gy = SteerabkeGaussian._gaussian_derivative_basis(size, sigma)
         G_theta = np.cos(theta) * Gx + np.sin(theta) * Gy
-        residual = Convolution_Correlation.convolution(image, G_theta)
+        residual = Convolution_Correlation.correlation(image, G_theta)
         basis = (Gx, Gy)
         return residual, G_theta, basis
