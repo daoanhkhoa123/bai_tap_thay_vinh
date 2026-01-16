@@ -7,7 +7,7 @@ class Convolution_Correlation:
     def correlation(img: NDArray, mask:NDArray) -> NDArray:
         h_in, w_in = img.shape
         h_mask, w_mask = mask.shape
-        h_out = h_mask - h_in + 1   # stride 1, no padding
+        h_out = h_in - h_mask + 1   # stride 1, no padding
         w_out = w_in - w_mask + 1
 
         res = np.empty([h_out, w_out], dtype=np.float32)
@@ -29,16 +29,16 @@ class Convolution_Correlation:
 class GaussianMask:
     @staticmethod
     def _gauss_function(x:int, y:int, x_0:int, y_0:int, sigma: float, dtype = np.float32) -> float:
-        _x = (x - x_0) ** 2 / 2 / sigma / sigma
-        _y = (y - y_0) ** 2 / 2 / sigma / sigma 
-        return np.exp(- (x + y))
+        x_ = (x - x_0) ** 2 / 2 / sigma / sigma
+        y_ = (y - y_0) ** 2 / 2 / sigma / sigma 
+        return np.exp(- (x_ + y_))
 
     @staticmethod
     def mask_gauss(sigma: float, size:int, dtype = np.float32) -> NDArray:
         if size % 2 == 0:
             raise ValueError()
         
-        offset = (size + 1)//2
+        offset = size //2
         res = np.empty([size, size], dtype= dtype)
         for y in range(size):
             for x in range(size):
@@ -88,11 +88,19 @@ class GaussianPyramid:
 class FourierGaussianFilter:
     @staticmethod
     def gaussian_fft(img: NDArray, kernel: NDArray) -> NDArray:
-        f_img = np.fft.fft2(img)
-        f_kernel = np.fft.fft2(kernel)
+        h, w = img.shape
+        kh, kw = kernel.shape
 
-        result = np.fft.ifft2(f_img * f_kernel)
-        return np.real(result)
+        padded_kernel = np.zeros_like(img)
+        padded_kernel[:kh, :kw] = kernel
+        padded_kernel = np.roll(padded_kernel, -kh//2, axis=0)
+        padded_kernel = np.roll(padded_kernel, -kw//2, axis=1)
+
+        f_img = np.fft.fft2(img)
+        f_kernel = np.fft.fft2(padded_kernel)
+
+        return np.real(np.fft.ifft2(f_img * f_kernel))
+
 
     @staticmethod
     def test():
@@ -148,9 +156,10 @@ class SteerabkeGaussian:
 
         for y in range(h):
             for x in range(w):
-                gauss_x[y, x] = -2 * x * np.exp(-x**2 - y**2)
-                gauss_y[y, x] = -2 * y *  np.exp(-x**2 - y**2)
-        
+                cx = cy = size // 2
+                gauss_x[y, x] = -(x - cx) / sigma**2 * gauss[y, x]
+                gauss_y[y, x] = -(y - cy) / sigma**2 * gauss[y, x]
+
         return gauss_x, gauss_y
 
     @staticmethod
