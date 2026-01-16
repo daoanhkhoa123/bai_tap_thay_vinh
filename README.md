@@ -1,8 +1,47 @@
 # bai_tap_thay_vinh
 
-# 1. Gaussian Pyramid
+# Code
 
-## d. Gaussian Pyramid
+## Convolution Correlation
+
+Correlation operation is done mainly by:
+```python
+res[y, x] = img[y: y + h_mask, x: x + w_mask].flatten().dot(flatten_mask)
+```
+
+Convolution is correlation with rotated kernel by $180^\circ$
+```python
+r_mask = mask[::-1, ::-1]
+return Convolution_Correlation.correlation(img, r_mask)
+```
+
+## Gaussian
+
+Each entry $(x, y)$ in the matrix is calculated from the gauss function in 2D. Then matrix is normalized to have summation of 1:
+```python
+res[y, x] = _gauss_function(x, y, offset, offset, sigma)
+...
+return res/res.sum()
+```
+
+Where `_gauss_function` is the gaussian function in 2D:
+$$
+G(x, y)
+=
+\exp\!\left(
+-\frac{(x - x_0)^2 + (y - y_0)^2}{2\sigma^2}
+\right)
+$$
+
+## Compare convolution with correlation by Gaussian kernel
+
+The image is created 1 in the middle and 0 everywhere else (delta image), size 100 × 100
+
+Kernel is 2D Gaussian, size $21 \times 21$, $\sigma = 5$
+
+
+
+# Theory
 
 **Question:**  
 What is the minimum memory capacity required to store a Gaussian pyramid?

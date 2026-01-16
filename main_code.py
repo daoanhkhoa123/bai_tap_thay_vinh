@@ -23,7 +23,6 @@ class Convolution_Correlation:
         # for each position
         for y in range(h_out):
             for x in range(w_out):
-                # weighed sum
                 res[y, x] = img[y: y + h_mask, x: x + w_mask].flatten().dot(flatten_mask)
         return res
 
@@ -56,9 +55,6 @@ class GaussianMask:
 class FilterImage:
     @staticmethod
     def create_img(size:int = 100, value = 1, dtype=np.uint8) -> NDArray:
-        if size % 2 == 0:
-            raise ValueError()
-        
         res = np.zeros([size, size], dtype=dtype)
         middle = (size + 1) // 2
         res[middle, middle] = value
