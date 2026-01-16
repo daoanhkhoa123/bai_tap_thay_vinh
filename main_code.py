@@ -44,7 +44,7 @@ class GaussianMask:
             for x in range(size):
                 res[y, x] = GaussianMask._gauss_function(x, y, offset, offset, sigma, dtype)
         
-        return res
+        return res/res.sum()
     
 class FilterImage:
     @staticmethod
@@ -148,7 +148,6 @@ class SteerabkeGaussian:
     def _gaussian_derivative_basis(size: int, sigma: float):
         assert size % 2 == 1
         gauss = GaussianMask.mask_gauss(sigma, size)
-        gauss /= gauss.sum()
         
         h, w = gauss.shape
         gauss_x = np.empty_like(gauss)
