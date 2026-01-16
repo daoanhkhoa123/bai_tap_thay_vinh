@@ -35,11 +35,40 @@ $$
 
 ## Compare convolution with correlation by Gaussian kernel
 
-The image is created 1 in the middle and 0 everywhere else (delta image), size 100 × 100
+The image $I$ is created 1 in the middle and 0 everywhere else (delta image), size 100 × 100
 
-Kernel is 2D Gaussian, size $21 \times 21$, $\sigma = 5$
+Kernel $K$ is 2D Gaussian, size $21 \times 21$, $\sigma = 5$
 
 
+$
+\begin {aligned}
+\text{Mean} \, | I * K - I \star K | &= 0.0
+\\
+\text{Mean} \, | K * I - K \star I | &= 0.0004947591
+\end{aligned}
+$
+
+where, $*$ denotes convolution, and $\star$ denotes correlation.
+
+Explaination:
+
+The $0$ absolute differences shows that convolution and correlation give the same result for the image. This happens when the kernel is symmetric, so flipping the kernel does not change it.
+While $0.0004947591$ should be error from floating-point error, and is small enough to ignore in practice.
+
+## Gaussian Pyramid
+
+Given an input image, first apply convolution with kernel filter, then scale down the image by 2:
+
+``` python
+res = Convolution_Correlation.convolution(img, kernel)
+return res[::2, ::2]
+```
+
+The pyramid is recursively applying the above for each scaled down of the image.
+
+## Fourier Transform
+
+The kernel is first padded to have the same shape like the image, then apply transformation `np.fft.fft2` to both the image and padded kernel, then multiply them.
 
 # Theory
 
