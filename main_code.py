@@ -83,8 +83,10 @@ class GaussianPyramid:
     def gaussian_pyramid(img: NDArray, size: int, sigma:float, time: int) -> Sequence[NDArray]:
         kernel = GaussianMask.mask_gauss(sigma, size)
         res = [img]
+        last = img
         for i in range(time):
-            res.append(GaussianPyramid._one_loop(res[i], kernel))
+            last = GaussianPyramid._one_loop(last, kernel)
+            res.append(last)
         return res
 
 class FourierGaussianFilter:
