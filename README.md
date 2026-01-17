@@ -1,5 +1,3 @@
-# bai_tap_thay_vinh
-
 # Code
 
 ## Convolution Correlation
@@ -17,7 +15,7 @@ return Convolution_Correlation.correlation(img, r_mask)
 
 ## Gaussian
 
-Each entry $(x, y)$ in the matrix is calculated from the gauss function in 2D. Then matrix is normalized to have summation of 1:
+Each entry $(x, y)$ in the matrix is calculated from the gauss function in 2D. Then matrix is normalized to have summation of 1 and thus the intergral constant normalization unit can be ignored:
 ```python
 res[y, x] = _gauss_function(x, y, offset, offset, sigma)
 ...
@@ -70,6 +68,32 @@ The pyramid is recursively applying the above for each scaled down of the image.
 
 The kernel is first padded to have the same shape like the image, then apply transformation `np.fft.fft2` to both the image and padded kernel, then multiply them.
 
+## Steerable Gaussian
+
+First, two partial derivative $G_x$ and $G_y$ is constructed by 
+
+$$
+\frac{\partial G}{\partial x}
+=
+-\frac{x}{\sigma^2}\, G(x,y),
+\quad\quad
+\frac{\partial G}{\partial y}
+=
+-\frac{y}{\sigma^2}\, G(x,y).
+$$
+
+```python
+gauss_x[y, x] = -(x - cx) / sigma**2 * gauss[y, x]
+gauss_y[y, x] = -(y - cy) / sigma**2 * gauss[y, x]
+```
+
+Then the rotated gaussian is synthesized and convoluted with the image
+
+```python
+G_theta = np.cos(theta) * Gx + np.sin(theta) * Gy
+residual = Convolution_Correlation.correlation(image, G_theta)
+```
+
 # Theory
 
 **Question:**  
@@ -102,6 +126,19 @@ $
 $
 
 ## Steerable Filters 
+
+**Question: How to prove the steerability of a filter?**
+
+**Answer**
+
+A steerable filter is an orientation-selective filter that can be computationally rotated to any direction. Rather than designing a new filter for each orientation, a steerable filter is synthesized from a linear combination of a small, fixed set of "basis filters" that is independent of angle $\theta$:
+
+$$
+f(x,y, \theta)
+=
+\sum_{j=1}^{M}
+k_j(\theta)\, f_j(x,y).
+$$
 
 **Question**
 Prove that derivative of Gaussian is a steerable filter
@@ -155,18 +192,23 @@ $$
 -\sin\theta & \cos\theta
 \end{bmatrix}
 \nabla_{x,y} G
-\\[6pt]
+\end{aligned}
+$$
+
+If we only care about the response of a rotated gaussian filter along the x-axis:
+
+$$
+\begin{aligned}
+\frac{\partial G}{\partial x'}
 &=
 \begin{bmatrix}
 \cos\theta & \sin\theta
 \end{bmatrix}
 \nabla_{x,y} G
-+
-\begin{bmatrix}
--\sin\theta & \cos\theta
-\end{bmatrix}
-\nabla_{x,y} G.
-\qquad \text{(Q.E.D.)}
+\\[6pt]
+&=
+\cos\theta\, G_x + \sin\theta\, G_y.
+\quad\quad \text{(Q.E.D)}
 \end{aligned}
 $$
 
@@ -174,24 +216,17 @@ $$
 
 **Answer**
 
-It is easy to see that $\nabla_{y}G$ is $\nabla_{x}G$ rotated by $90^\circ$, which are orthogonal and thus constitue two basis:
+It is easy to see that $\partial_{y}G$ is $\partial_{x}G$ rotated by $90^\circ$, which are orthogonal and thus constitue two basis:
 
 $$
-G^{90^\circ}x =  -2(x\cos{90^\circ} + y\sin{90^\circ}) \, e^{-x^2 - y^2} = -2y \,  e^{-x^2 - y^2} 
+G^{90^\circ}_x =  -2(x\cos{90^\circ} + y\sin{90^\circ}) \, e^{-x^2 - y^2} = -2y \,  e^{-x^2 - y^2} 
 $$
 
-**Question: How to prove the steerability of a filter?**
-
-**Answer**
-
-A steerable filter is an orientation-selective filter that can be computationally rotated to any direction. Rather than designing a new filter for each orientation, a steerable filter is synthesized from a linear combination of a small, fixed set of "basis filters" that is independent of angle $\theta$:
 
 $$
-f(x,y, \theta)
-=
-\sum_{j=1}^{M}
-k_j(\theta)\, f_j(x,y).
+G^{\theta^\circ}_x =\cos\theta G^{0^\circ}_x + \sin\theta G^{90^\circ}_x
 $$
+
 
 **Question Prove second derivative of gaussian is also steerable and has no less than 3 basis.**
 
