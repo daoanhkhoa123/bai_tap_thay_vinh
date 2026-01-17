@@ -51,7 +51,7 @@ where, $*$ denotes convolution, and $\star$ denotes correlation.
 Explaination:
 
 The $0$ absolute differences shows that convolution and correlation give the same result for the image. This happens when the kernel is symmetric, so flipping the kernel does not change it.
-While $0.0004947591$ should be error from floating-point error, and is small enough to ignore in practice.
+While $0.0004947591$ migth be error from the even shape of the image does not have the true middle input the uneven padding becuse of the odd shape of kernel. Nevertheless, it is safe to ignore in practice.
 
 ## Gaussian Pyramid
 
