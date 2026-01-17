@@ -1,12 +1,87 @@
 <script>
-  MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],
+    displayMath: [['$$', '$$']],
+    packages: {'[+]': ['ams']}
+  },
+  options: {
+    renderActions: {
+      addMenu: []
     }
-  };
+  }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<style>
+  body {
+    font-family: "STIX Two Text", "Times New Roman", serif;
+    line-height: 1.6;
+    color: #111827;
+    background: #ffffff;
+    margin: 0;
+  }
+
+  header, footer {
+    padding: 1.2rem 2.5rem;
+    border-color: #e5e7eb;
+    border-style: solid;
+    border-width: 0;
+  }
+
+  header {
+    border-bottom-width: 1px;
+  }
+
+  footer {
+    border-top-width: 1px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  header p {
+    margin: 0.2rem 0 0;
+    font-size: 0.95rem;
+    color: #6b7280;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 2.5rem;
+  }
+
+  h2, h3 {
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 2.5rem;
+  }
+
+  .math-block {
+    margin: 1.5rem 0;
+  }
+</style>
+
+<footer>
+  <div>Dao Anh Khoa</div>
+  <div id="date"></div>
+</footer>
+
+<script>
+  document.getElementById("date").textContent =
+    new Date().toLocaleDateString();
+</script>
+
 
 # Code
 
@@ -34,12 +109,9 @@ return res/res.sum()
 
 Where `_gauss_function` is the gaussian function in 2D:
 $$
-G(x, y)
-=
-\exp\!\left(
--\frac{(x - x_0)^2 + (y - y_0)^2}{2\sigma^2}
-\right)
-$$
+G(x, y) =
+\exp\!\left( -\frac{(x - x_0)^2 + (y - y_0)^2}{2\sigma^2}
+\right)$$
 
 ## Compare convolution with correlation by Gaussian kernel
 
@@ -47,14 +119,11 @@ The image $I$ is created 1 in the middle and 0 everywhere else (delta image), si
 
 Kernel $K$ is 2D Gaussian, size $21 \times 21$, $\sigma = 5$
 
-
-$
-\begin {aligned}
-\text{Mean} \, | I * K - I \star K | &= 0.0
-\\
-\text{Mean} \, | K * I - K \star I | &= 0.0004947591
-\end{aligned}
-$
+$$
+\begin{aligned}
+\text{Mean}\lvert I * K - I \star K \rvert &= 0.0, \\\\
+\text{Mean}\lvert K * I - K \star I \rvert &= 0.0004947591.
+\end{aligned}$$
 
 where, $*$ denotes convolution, and $\star$ denotes correlation.
 
@@ -83,14 +152,13 @@ The kernel is first padded to have the same shape like the image, then apply tra
 First, two partial derivative $G_x$ and $G_y$ is constructed by 
 
 $$
-\frac{\partial G}{\partial x}
-=
--\frac{x}{\sigma^2}\, G(x,y),
+\frac{\partial G}{\partial x} = 
+-\frac{x - c_x}{\sigma^2} G(x,y)
 \quad\quad
-\frac{\partial G}{\partial y}
-=
--\frac{y}{\sigma^2}\, G(x,y).
+\frac{\partial G}{\partial y} =
+-\frac{y - c_y}{\sigma^2} G(x,y)
 $$
+
 
 ```python
 gauss_x[y, x] = -(x - cx) / sigma**2 * gauss[y, x]
@@ -121,8 +189,7 @@ What is the minimum memory capacity required to store a Gaussian pyramid?
 **Answer:**  
 Let the input image have width $W$ and height $H$, with total area  
 $$
-A = W \times H
-$$
+A = W \times H$$
 
 A Gaussian pyramid is constructed by repeatedly downsampling the image by a factor of 2 in both width and height at each level.  
 
@@ -133,10 +200,8 @@ $
 
 The total memory required to store the entire pyramid is:
 $$
-\sum_{i=0}^{\infty} \frac{A}{4^i}
-=
-A \cdot \frac{1}{1 - \frac{1}{4}} = \frac{4}{3} A
-$$
+\sum_{i=0}^{\infty} \frac{A}{4^i} =
+A \cdot \frac{1}{1 - \frac{1}{4}} = \frac{4}{3} A$$
 
 **Conclusion:**  
 The smallest memory capacity required to store a Gaussian pyramid is:
@@ -153,11 +218,9 @@ $
 A steerable filter is an orientation-selective filter that can be computationally rotated to any direction. Rather than designing a new filter for each orientation, a steerable filter is synthesized from a linear combination of a small, fixed set of "basis filters" that is independent of angle $\theta$:
 
 $$
-f(x,y, \theta)
-=
+f(x,y, \theta) =
 \sum_{j=1}^{M}
-k_j(\theta)\, f_j(x,y).
-$$
+k_j(\theta) f_j(x,y).$$
 
 **Question**
 Prove that derivative of Gaussian is a steerable filter
@@ -167,68 +230,58 @@ Prove that derivative of Gaussian is a steerable filter
 Rotation of a function $f(x,y)$ is performed by multiplying the coordinate system with a rotation matrix paramaterized by angle $\theta$.  
 $$
 \begin{bmatrix}
-x' \\
+x' \\\\
 y'
-\end{bmatrix}
-=
+\end{bmatrix} =
 \begin{bmatrix}
-\cos\theta & \sin\theta \\
--\sin\theta & \cos\theta
+\cos\theta & \sin\theta \\\\ -\sin\theta & \cos\theta
 \end{bmatrix}
 \begin{bmatrix}
-x \\
+x \\\\
 y
-\end{bmatrix}.
-$$
+\end{bmatrix}.$$
 
 
 Without loss of generalization, assume that $x_0 = y_0 =0$ and $\sigma_x =\sigma_y = 1$, and ingore the constants. Then the gaussian function is: 
 $$
-G(x, y) = e^{-x^2 - y^2} 
+G(x, y) = e^{-x^2 - y^2} $$
+
+It is straightforward to see that Gaussian function is isotropic: $G(x, y) = G(x', y')$. Next, the partial derivative of Gaussian to each axis:
+
 $$
-
-It is straightforward to see that Gaussian function is isometric: $G(x, y) = G(x', y')$. Next, the partial derivative of Gaussian to each axis:
-
-$$ 
 \begin{aligned}
 \frac{\partial G}{\partial x'}
-&= G_{x'} = -2x'\, e^{-x'^2 - y'^2} = -2(x\cos\theta + y\sin\theta)\, e^{-x^2 - y^2} \\
-
+&= G_{x'}
+= -2x' e^{-(x'^2 + y'^2)}
+= -2(x\cos\theta + y\sin\theta)\ e^{-(x^2 + y^2)} \\\\
 \frac{\partial G}{\partial y'}
 &= G_{y'}
-= -2y'\, e^{-x'^2  y'^2} 
-= -2(-x\sin\theta + y\cos\theta)\, e^{-x^2 - y^2}
+= -2y' e^{-(x'^2 + y'^2)}
+= -2(-x\sin\theta + y\cos\theta)\ e^{-(x^2 + y^2)}
 \end{aligned}
 $$
 
 It is now straightforward to see that:
+
 $$
 \begin{aligned}
 \nabla_{x'y'} G
 &=
 \begin{bmatrix}
-\cos\theta & \sin\theta \\
--\sin\theta & \cos\theta
+\cos\theta & \sin\theta \\\\ -\sin\theta & \cos\theta
 \end{bmatrix}
 \nabla_{x,y} G
-\end{aligned}
-$$
+\end{aligned}$$
 
-If we only care about the response of a rotated gaussian filter along the x-axis:
+Furthermore, if we only care about the response of a rotated gaussian filter along the x-axis:
 
 $$
-\begin{aligned}
-\frac{\partial G}{\partial x'}
-&=
+\frac{\partial G}{\partial x'} =
 \begin{bmatrix}
 \cos\theta & \sin\theta
-\end{bmatrix}
-\nabla_{x,y} G
-\\[6pt]
-&=
-\cos\theta\, G_x + \sin\theta\, G_y.
-\quad\quad \text{(Q.E.D)}
-\end{aligned}
+\end{bmatrix} 
+\nabla_{x,y} G =
+\cos\theta G_x + \sin\theta G_y.
 $$
 
 **Question: How many basis?**
@@ -238,13 +291,11 @@ $$
 It is easy to see that $\partial_{y}G$ is $\partial_{x}G$ rotated by $90^\circ$, which are orthogonal and thus constitue two basis:
 
 $$
-G^{90^\circ}_x =  -2(x\cos{90^\circ} + y\sin{90^\circ}) \, e^{-x^2 - y^2} = -2y \,  e^{-x^2 - y^2} 
-$$
+G^{90^\circ}_x =  -2(x\cos{90^\circ} + y\sin{90^\circ})  e^{-x^2 - y^2} = -2y   e^{-x^2 - y^2} $$
 
 
 $$
-G^{\theta^\circ}_x =\cos\theta G^{0^\circ}_x + \sin\theta G^{90^\circ}_x
-$$
+G^{\theta^\circ}_x =\cos\theta G^{0^\circ}_x + \sin\theta G^{90^\circ}_x$$
 
 
 **Question Prove second derivative of gaussian is also steerable and has no less than 3 basis.**
@@ -253,24 +304,19 @@ $$
 
 $$
 \begin{aligned}
-
 G_{x'x'} &= \frac{\partial^2 G}{\partial x'^2}
-\\
+\\\\
 &=
 \left(
-\cos\theta \frac{\partial}{\partial x}
-+
+\cos\theta \frac{\partial}{\partial x} +
 \sin\theta \frac{\partial}{\partial y}
 \right)^2 G
-\\
+\\\\
 &=
-\cos^2\theta\, G_{xx}
-+
-2\sin\theta\cos\theta\, G_{xy}
-+
-\sin^2\theta\, G_{yy}.
-\end{aligned}
-$$
+\cos^2\theta G_{xx} +
+2\sin\theta\cos\theta G_{xy} +
+\sin^2\theta G_{yy}.
+\end{aligned}$$
 
 With $G$ independent of angle $\theta$. Because the second-order derivative produces polynomials of degree 2 in $\cos\theta$ and $\sin\theta$, there shall be no less than 3 basis.
 
@@ -282,14 +328,9 @@ The third-order directional derivative can be written as a linear combination of
 There should be at least 4 basis, since the angular dependence consists of monomials of degree 3 has number of linearly indepdendent is 4: 
 
 $$
-G_{x'x'x'}
-=
-\cos^3\theta\, G_{xxx}
-+
-3\cos^2\theta\sin\theta\, G_{xxy}
-+
-3\cos\theta\sin^2\theta\, G_{xyy}
-+
-\sin^3\theta\, G_{yyy}.
-$$
+G_{x'x'x'} =
+\cos^3\theta G_{xxx} +
+3\cos^2\theta\sin\theta G_{xxy} +
+3\cos\theta\sin^2\theta G_{xyy} +
+\sin^3\theta G_{yyy}.$$
 
