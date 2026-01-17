@@ -87,12 +87,21 @@ gauss_x[y, x] = -(x - cx) / sigma**2 * gauss[y, x]
 gauss_y[y, x] = -(y - cy) / sigma**2 * gauss[y, x]
 ```
 
-Then the rotated gaussian is synthesized and convoluted with the image
+First, the oriented kernel is synthesized and then correlated with the image
 
 ```python
 G_theta = np.cos(theta) * Gx + np.sin(theta) * Gy
-residual = Convolution_Correlation.correlation(image, G_theta)
+response = Convolution_Correlation.correlation(image, G_theta)
 ```
+
+Second, the image is correlated separately with the basis filters $G_x$ and $G_y$, and the responses are then linearly combined:
+```python
+Rx = Convolution_Correlation.correlation(image, Gx)
+Ry = Convolution_Correlation.correlation(image, Gy)
+steered_response = np.cos(theta) * Rx + np.sin(theta) * Ry
+```
+
+Mean of absolute differences between two result is `-6.2032542998919654e-09`
 
 # Theory
 

@@ -172,11 +172,12 @@ class SteerabkeGaussian:
     def steerable(image: NDArray, theta: float,
               size: int = 21, sigma: float = 3.0) -> Tuple[NDArray, NDArray, NDArray, Tuple[NDArray, NDArray]]:
 
+        # steer kernel
         Gx, Gy = SteerabkeGaussian._gaussian_derivative_basis(size, sigma)
         G_theta = np.cos(theta) * Gx + np.sin(theta) * Gy
         response = Convolution_Correlation.correlation(image, G_theta)
 
-        # basis responses
+        # steer response
         Rx = Convolution_Correlation.correlation(image, Gx)
         Ry = Convolution_Correlation.correlation(image, Gy)
         steered_response = np.cos(theta) * Rx + np.sin(theta) * Ry
