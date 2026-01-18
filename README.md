@@ -147,6 +147,25 @@ The pyramid is recursively applying the above for each scaled down of the image.
 
 The kernel is first padded to have the same shape like the image, then apply transformation `np.fft.fft2` to both the image and padded kernel, then multiply them.
 
+## High pass - Band pass Gaussian
+
+A Gaussian kernel acts as a low-pass filter, preserving low-frequency components while suppressing high-frequency details. To construct a high-pass Gaussian, we subtract the Gaussian low-pass response from an impulse (Dirac delta) centered at the kernel origin. This allows low-frequency content to be attenuated and high-frequency components (edges, fine details) to be emphasized.
+
+```python
+gauss = GaussianMask.mask_gauss(sigma, size)
+delta = np.zeros_like(gauss)
+delta[center, center] = 1.0
+high_pass = delta - gauss
+```
+
+A band-pass Gaussian filter preserves frequencies within a specific range while suppressing both low and high extremes. It can be constructed by taking the difference of two Gaussian low-pass filters with different standard deviations.
+
+```python
+g_low = GaussianMask.mask_gauss(sigma_low, size)
+g_high = GaussianMask.mask_gauss(sigma_high, size)
+band_pass = g_low - g_high
+```
+
 ## Steerable Gaussian
 
 First, two partial derivative $G_x$ and $G_y$ is constructed by 
