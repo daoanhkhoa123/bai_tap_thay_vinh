@@ -98,10 +98,18 @@ class FourierGaussianFilter:
         h, w = img.shape
         kh, kw = kernel.shape
 
-        padded_kernel = np.zeros_like(img)
-        padded_kernel[:kh, :kw] = kernel
-        padded_kernel = np.roll(padded_kernel, -kh//2, axis=0)
-        padded_kernel = np.roll(padded_kernel, -kw//2, axis=1)
+        pad_h = h - kh
+        pad_w = w - kw
+
+        # zero-pad kernel to image size
+        padded_kernel = np.pad(
+            kernel,
+            ((0, pad_h), (0, pad_w)),
+            mode="constant"
+        )
+
+        # shift kernel so that its center is at (0, 0)
+        padded_kernel = np.fft.ifftshift(padded_kernel)
 
         f_img = np.fft.fft2(img)
         f_kernel = np.fft.fft2(padded_kernel)
