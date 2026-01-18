@@ -110,7 +110,7 @@ return res/res.sum()
 Where `_gauss_function` is the gaussian function in 2D:
 $$
 G(x, y) =
-\exp\!\left( -\frac{(x - x_0)^2 + (y - y_0)^2}{2\sigma^2}
+\exp\left( -\frac{(x - x_0)^2 + (y - y_0)^2}{2\sigma^2}
 \right)$$
 
 ## Compare convolution with correlation by Gaussian kernel
